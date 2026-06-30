@@ -1,0 +1,29 @@
+# .cursorrules — ResumeFit
+
+Note: this project is primarily built using Claude Code, which reads `CLAUDE.md` at project root for full context. This file mirrors the same core rules for any session using Cursor or another agent that reads `.cursorrules` instead. See `CLAUDE.md` and `docs/` for complete details.
+
+## Project
+ResumeFit: an AI web app that tailors a resume to a job posting, only generating rewritten content traceable to real evidence in the user's original resume, and flags which claims the user might struggle to defend in an interview. Target user: career switchers. Full spec in `docs/02-spec.md`, architecture in `docs/03-architecture.md`.
+
+## Non-negotiable rule
+Never generate a tailored resume bullet unless it can be traced back to specific text in the user's original resume. No evidence, no bullet. Fail safe by omitting content, never by inventing it.
+
+## Stack
+Next.js 14 (App Router) + TypeScript (strict) + Tailwind CSS + Anthropic Claude API (via `@anthropic-ai/sdk`). No database, no auth, stateless, deployed on Vercel.
+
+## Structure
+- AI pipeline lives in `lib/ai/stages/` as 5 discrete, independently testable stage functions (extraction → evidence matching → grounded rewrite → defensibility reasoning → verdict). Do not collapse into a single prompt.
+- API routes in `app/api/` stay thin: validate, call pipeline, return JSON.
+
+## Security
+- Read `ANTHROPIC_API_KEY` only from `process.env`. Never hardcode it, never expose it client-side, never log it.
+- No persisted user data; every request is stateless.
+
+## Scope
+Do not add file upload, auth, a database, cover letters, or multi-resume features unless explicitly asked — see `docs/02-spec.md` Section 6 for the full out-of-scope list.
+
+## Commits
+Small, descriptive, imperative commit messages after each meaningful chunk of work — not one giant commit at the end.
+
+## Testing
+Minimum 3 unit tests, focused on proving the no-fabrication constraint holds (see `docs/02-spec.md` Section 7). Run with `npm test`.

@@ -1,11 +1,13 @@
 # Spec: ResumeFit Core AI Feature
 
-## Overview
-This spec defines the input/output contract and acceptance criteria for ResumeFit's core AI pipeline: evidence-grounded resume tailoring with traceability and interview-defensibility flags.
+## 1. Context & Goal
+ResumeFit's core AI module tailors a user's resume to a specific job posting. It exists to solve a validated problem (see `docs/01-validation-and-prd.md`): career switchers struggle to translate their real experience into a target field's language, and existing AI resume tools often produce content the user can't actually defend in an interview. This module is used by a single end user pasting their own resume and a job posting into the web UI — there is no multi-user or admin context. The module's job is to tailor the resume *without ever fabricating experience*, and to make every tailored claim traceable and interview-defensible. This is the single most important goal of the module and should override convenience or polish wherever they conflict.
+
+This spec defines the input/output contract and acceptance criteria for that pipeline.
 
 ---
 
-## 1. Inputs
+## 2. Inputs
 
 | Input | Type | Required | Notes |
 |---|---|---|---|
@@ -19,7 +21,7 @@ This spec defines the input/output contract and acceptance criteria for ResumeFi
 
 ---
 
-## 2. Output Structure
+## 3. Inputs & Outputs (continued) — Output Structure
 
 The AI pipeline returns a single structured JSON object with four parts:
 
@@ -58,7 +60,7 @@ The AI pipeline returns a single structured JSON object with four parts:
 
 ---
 
-## 3. Processing Pipeline (Acceptance Criteria Per Stage)
+## 4. Behavior Rules (Processing Pipeline, Stage by Stage)
 
 ### Stage 1 — Requirement Extraction
 - **Input:** `jobPostingText`
@@ -101,8 +103,19 @@ The AI pipeline returns a single structured JSON object with four parts:
 
 ---
 
-## 4. UI Requirements (high-level, expanded in architecture doc)
+## 5. Constraints
 
+**Tech stack:** Next.js 14 (App Router), TypeScript, Tailwind CSS, Vercel AI SDK + Anthropic Claude API. No database, no auth in v1 (see `docs/03-architecture.md` for full stack rationale).
+
+**Libraries to avoid:** no third-party resume-parsing libraries that strip formatting context the AI needs; no client-side-only API calls (the Anthropic API key must never be exposed to the browser — all AI calls happen server-side via Next.js API routes).
+
+**Security requirements:** `ANTHROPIC_API_KEY` must only be read from environment variables (`process.env`), never hardcoded; no user data is persisted server-side (stateless per-request design).
+
+**Performance limits:** input length capped (~6,000 characters per field) to control API cost and latency; pipeline should complete within a reasonable user-facing wait time (target: under ~15 seconds for the full 5-stage run, acceptable for a synchronous demo use case).
+
+**Coding style:** TypeScript strict mode; pipeline stages implemented as small, independently testable functions (see `docs/03-architecture.md` Section 3 for why a multi-stage design is non-negotiable for this project).
+
+**UI requirements (high-level, expanded in architecture doc):**
 - Two-pane input: resume textarea + job posting textarea
 - One-click "Tailor My Resume" action
 - Results view showing:
@@ -113,7 +126,7 @@ The AI pipeline returns a single structured JSON object with four parts:
 
 ---
 
-## 5. Out of Scope (v1)
+## 6. Out of Scope (v1)
 Confirmed from PRD — explicitly excluded:
 - File upload (PDF/DOCX) — text paste only
 - Resume formatting/export to PDF
@@ -123,10 +136,13 @@ Confirmed from PRD — explicitly excluded:
 
 ---
 
-## 6. Testing Notes
+## 7. Acceptance Criteria Summary & Testing Notes
 Minimum 3 unit tests should cover:
 1. Requirement extraction returns a non-empty, reasonably-structured list for a sample job posting
 2. Evidence matching never returns a `sourceSpans` entry that isn't present (or substantially present) in the input resume text
 3. Rewrite generation never produces a bullet for a requirement marked `evidenceStrength: none`
 
-These three map directly to the "no fabrication" hard constraint, which is the riskiest and most important behavior to verify.
+These three map directly to the "no fabrication" hard constraint, which is the riskiest and most important behavior to verify. Each is a testable "Given X, when Y, then Z" condition:
+- *Given* a job posting with N distinct requirements, *when* extraction runs, *then* the output contains N discrete, non-overlapping requirement objects.
+- *Given* a resume with no mention of a required skill, *when* evidence matching runs, *then* `evidenceStrength` for that requirement is `none` and no bullet referencing it is later generated.
+- *Given* a requirement with `evidenceStrength: strong`, *when* rewrite generation runs, *then* the resulting bullet's `sourceSpans` field is non-empty and traceable to the original resume text.

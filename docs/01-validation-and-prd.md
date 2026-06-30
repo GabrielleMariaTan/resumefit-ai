@@ -4,11 +4,20 @@
 
 ---
 
+## Why Now
+
+Two trends are converging right now that make this the right moment for ResumeFit specifically, rather than a generic resume tool:
+
+1. **AI resume tools have become mainstream almost overnight, but trust hasn't caught up.** As shown in Step 4's market evidence, recruiters are increasingly reporting that AI-polished resumes are harder to verify, slower to screen, and create a "resume illusion" — a gap between what's written and what a candidate can actually defend. A 2025 industry survey found nearly one in five recruiters would reject a candidate specifically for AI-generated application content. This distrust problem barely existed three years ago; it's a direct byproduct of how fast AI writing tools have been adopted, which makes a *defensibility-first* tool timely in a way it wouldn't have been even in 2023.
+2. **Career switching itself has become more common and more necessary**, as automation, layoffs, and industry restructuring push more people to look outside their original field — exactly the population our own survey data (Step 2) confirms is being underserved by tools built for same-field job hunting. The convergence of "more people switching fields" and "less trust in AI-assisted applications" is precisely the gap ResumeFit is built to close, and it's a gap that's widening, not stabilizing — making this a better moment to build this than either one year ago or one year from now once a trust-focused competitor likely fills the space.
+
+---
+
 ## Step 1: Identify the Specific User
 
 **Target user:** Career switchers — people moving from one field into a new one where their existing experience doesn't map 1:1 onto the job posting's language, and who are wary of generic AI resume tools producing claims they can't back up.
 
-**Concrete example personas:**
+**Concrete example personas (pick 1-2 to interview, don't try to serve all of them):**
 - A public school teacher applying to corporate L&D / instructional design roles
 - A call center / BPO agent applying to customer success or account management roles
 - A retail/ops manager applying to project coordinator roles
@@ -16,7 +25,10 @@
 
 **Why this group specifically:** Generic resume tailoring tools assume the user already speaks the target industry's language and just needs polish. Career switchers don't have that — their real blocker is *translation*, not vocabulary. And when they do use AI tools to "tailor" their resume, they're often left uneasy: did it just write something I can't actually back up in an interview?
 
+**Action item:** Write down 3 names of real people you know (or can reach through LinkedIn/FB groups/AIM alumni network) who fit one persona. You need to actually talk to 3-5 of them for Step 2.
+
 ---
+
 
 ## Step 2: Conduct Problem Interviews (User Evidence)
 
@@ -70,7 +82,7 @@ Full anonymized survey responses are available in `docs/raw-survey-responses.csv
 
 ## Step 4: Validate Market Demand (Market Evidence)
 
-Below is real, sourced evidence gathered for both halves of the problem (translation difficulty, and distrust of AI-generated resume content). All sources are paraphrased as per citation rules — follow the links to read full context.
+You don't need a huge market study — just enough evidence this isn't a problem of one. Below is real, sourced evidence gathered for both halves of the problem (translation difficulty, and distrust of AI-generated resume content). All sources are paraphrased per citation rules — follow the links to read full context, and add your own screenshots for your actual submission.
 
 ### A. Evidence of the career-switch "translation" problem (Philippine context)
 
@@ -84,8 +96,10 @@ Below is real, sourced evidence gathered for both halves of the problem (transla
 - A hiring-side write-up described reviewing hundreds of applications and finding that AI-generated resumes get callbacks but then go silent at the next stage — attributed directly to candidates being unable to speak fluently to their own AI-written bullet points when asked follow-up questions. ([Leon Consulting](https://leonstaff.com/blogs/why-ai-generated-resumes-fail-interviews/))
 - A 2025 industry survey found nearly one in five recruiters said they would reject a candidate specifically for submitting an AI-generated resume or cover letter — confirming this isn't a fringe concern. ([AiApply](https://aiapply.co/blog/can-employers-tell-if-you-use-ai-for-a-cover-letter))
 
-### C. Why this strengthens the differentiator
-The market problem isn't just "AI resumes look generic," it's that **recruiters increasingly can't trust what's on the page, and candidates get caught off guard when asked to defend it** — which is exactly the gap of traceability + defensibility-check feature is designed to close.
+### C. Why this strengthens your differentiator
+Part B is especially useful evidence for your pitch: the market problem isn't just "AI resumes look generic," it's that **recruiters increasingly can't trust what's on the page, and candidates get caught off guard when asked to defend it** — which is exactly the gap your traceability + defensibility-check feature is designed to close.
+
+**Action item for your actual submission:** Take screenshots of the r/phcareers threads above (or find 1-2 fresh ones from your own search), and pair them with at least one quote/stat from section B in your final report.
 
 ---
 
@@ -111,7 +125,7 @@ The market problem isn't just "AI resumes look generic," it's that **recruiters 
 | Rezi | ATS-optimized resume writing | Optimizes wording, can over-embellish, no link back to source evidence |
 | ChatGPT (generic prompt) | Flexible, can rewrite anything | No structured extraction of requirements, no traceability, prone to fabricating plausible-sounding claims |
 
-**Conclusion:** No existing tool combines resume tailoring with a verifiable trace back to the user's real experience, or warns the user which rewritten claims they might struggle to defend in an interview. The market addresses "does this look good" — not "can I actually back this up."
+**Conclusion to write in your PRD:** No existing tool combines resume tailoring with a verifiable trace back to the user's real experience, or warns the user which rewritten claims they might struggle to defend in an interview. The market addresses "does this look good" — not "can I actually back this up."
 
 ---
 
@@ -125,14 +139,14 @@ The market problem isn't just "AI resumes look generic," it's that **recruiters 
 - Output a full tailored resume draft (not just sample bullets) alongside the traceability and defensibility annotations
 - Usable web UI showing original resume, tailored resume, and the evidence links side by side
 
-**v1 explicitly will NOT do:**
+**v1 explicitly will NOT do (write this down — it protects your scope):**
 - Invent or imply experience the user doesn't have, under any circumstance — this is a hard constraint, not just a nice-to-have
 - Full resume formatting/design templates
 - Cover letter generation
 - Job board integration or job search
 - Multi-resume comparison, tracking, or accounts/login for v1
 
-**Success metric for demo:** Run 2-3 real resume/posting pairs (ideally from survey respondents who are willing to share a sample resume) and confirm: (1) every rewritten claim can be traced to real source content, (2) the defensibility flags align with what a real respondent says they could/couldn't actually elaborate on in an interview.
+**Success metric for your demo:** Run 2-3 real resume/posting pairs (ideally from survey respondents who are willing to share a sample resume) and confirm: (1) every rewritten claim can be traced to real source content, (2) the defensibility flags align with what a real respondent says they could/couldn't actually elaborate on in an interview.
 
 ---
 
@@ -181,3 +195,5 @@ Inventing experience the user doesn't have (hard constraint), resume formatting/
 - Keeping scope tight (resist adding resume builder/cover letter/template features) will be the main discipline challenge
 
 ---
+
+*Next step: Phase 2 — turn this PRD into architecture notes and spec.md, including how the grounding/citation mechanism will actually be implemented (e.g. structured extraction + evidence-matching prompts before generation).*
