@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-// ── Response types (mirror the spec Section 3 output schema) ──────────────────
+// ── Response types ────────────────────────────────────────────────────────────
 
 type EvidenceStrength = 'strong' | 'partial' | 'none';
 type DefensibilityFlag = 'likely_defensible' | 'be_ready_to_elaborate';
@@ -32,47 +32,136 @@ interface TailorResult {
   overallVerdict: { summary: VerdictSummary; reasoning: string };
 }
 
+// ── Design tokens ─────────────────────────────────────────────────────────────
+
+const SILK = 'cubic-bezier(0.16, 1, 0.3, 1)';
+const CARD_SHADOW = '0 2px 16px rgba(13, 115, 119, 0.08)';
+
 // ── Styling maps ──────────────────────────────────────────────────────────────
 
 const VERDICT_CONFIG: Record<
   VerdictSummary,
-  { wrapper: string; label: string; dot: string; heading: string; displayText: string }
+  { borderColor: string; bg: string; labelColor: string; headingColor: string; displayText: string }
 > = {
   likely_to_advance: {
-    wrapper: 'bg-emerald-50 border border-emerald-200',
-    label: 'text-emerald-700',
-    dot: 'bg-emerald-500',
-    heading: 'text-emerald-900',
+    borderColor: '#059669',
+    bg: '#f0fdf4',
+    labelColor: '#059669',
+    headingColor: '#064e3b',
     displayText: 'Likely to Advance',
   },
   mixed: {
-    wrapper: 'bg-amber-50 border border-amber-200',
-    label: 'text-amber-700',
-    dot: 'bg-amber-500',
-    heading: 'text-amber-900',
+    borderColor: '#d97706',
+    bg: '#fffbeb',
+    labelColor: '#d97706',
+    headingColor: '#78350f',
     displayText: 'Mixed Fit',
   },
   likely_screened_out: {
-    wrapper: 'bg-red-50 border border-red-200',
-    label: 'text-red-700',
-    dot: 'bg-red-500',
-    heading: 'text-red-900',
+    borderColor: '#dc2626',
+    bg: '#fef2f2',
+    labelColor: '#dc2626',
+    headingColor: '#7f1d1d',
     displayText: 'Likely Screened Out',
   },
 };
 
-const DEFENSIBILITY_CONFIG: Record<DefensibilityFlag, { badge: string; label: string }> = {
+const DEFENSIBILITY_CONFIG: Record<DefensibilityFlag, { bg: string; color: string; label: string }> = {
   likely_defensible: {
-    badge: 'bg-green-100 text-green-800',
+    bg: '#d1fae5',
+    color: '#065f46',
     label: 'Likely Defensible',
   },
   be_ready_to_elaborate: {
-    badge: 'bg-amber-100 text-amber-800',
+    bg: '#fef3c7',
+    color: '#92400e',
     label: 'Be Ready to Elaborate',
   },
 };
 
 const MIN_LENGTH = 100;
+
+// ── Shared layout wrappers ────────────────────────────────────────────────────
+
+function PageShell({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ padding: '48px 24px' }}>
+      <div style={{ maxWidth: '860px', margin: '0 auto' }}>
+        <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', boxShadow: CARD_SHADOW }}>
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SiteHeader({ onReset }: { onReset?: () => void }) {
+  return (
+    <header
+      style={{
+        background: 'linear-gradient(135deg, rgba(232,247,246,0.85) 0%, rgba(245,255,254,0.85) 60%, rgba(255,255,255,0.85) 100%)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        borderBottom: '1px solid #d0ecea',
+      }}
+    >
+      <div
+        className="rf-header-inner"
+        style={{
+          maxWidth: '860px',
+          margin: '0 auto',
+          padding: '28px 32px',
+          position: 'relative',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'flex-start',
+        }}
+      >
+        <div style={{ textAlign: 'center' }}>
+          <h1 className="rf-wordmark" style={{ fontWeight: 700, fontSize: '2.25rem', margin: 0, lineHeight: 1.15 }}>
+            <span style={{ color: '#0d7377' }}>Resume</span>
+            <span style={{ color: '#1a2e2e' }}>Fit</span>
+          </h1>
+          <p
+            className="rf-subtitle"
+            style={{
+              fontSize: '1.05rem',
+              color: '#4a6b6b',
+              margin: '6px auto 0',
+              lineHeight: 1.5,
+              maxWidth: '600px',
+            }}
+          >
+            Tailor your resume to any job using only your real experience — plus expert insights on how well you can defend every claim in an interview.
+          </p>
+        </div>
+        {onReset && (
+          <button
+            onClick={onReset}
+            className="rf-link rf-start-over"
+            style={{
+              position: 'absolute',
+              right: '32px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              fontSize: '0.875rem',
+              color: '#4a6b6b',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '10px 0',
+              fontFamily: 'inherit',
+              transition: `color 280ms ${SILK}`,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            ← Start over
+          </button>
+        )}
+      </div>
+    </header>
+  );
+}
 
 // ── Main component ────────────────────────────────────────────────────────────
 
@@ -157,78 +246,170 @@ export default function Home() {
     const { bullets } = result.tailoredResume;
 
     return (
-      <main className="min-h-screen bg-gray-50">
-        <div className="max-w-3xl mx-auto px-4 py-10">
-          {/* Page header */}
-          <div className="flex items-start justify-between mb-8">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">ResumeFit</h1>
-              <p className="text-sm text-gray-500 mt-0.5">Evidence-grounded resume tailoring</p>
-            </div>
-            <button
-              onClick={handleReset}
-              className="text-sm text-gray-500 hover:text-gray-900 underline underline-offset-2 mt-1 transition-colors"
-            >
-              ← Start over
-            </button>
-          </div>
+      <div style={{ backgroundColor: '#f0faf8', minHeight: '100vh' }}>
+        <SiteHeader onReset={handleReset} />
+        <PageShell>
+        <main className="rf-page-content" style={{ padding: '48px 32px' }}>
 
           {/* Verdict banner */}
-          <div className={`rounded-xl px-5 py-4 mb-8 ${verdict.wrapper}`}>
-            <div className="flex items-center gap-2 mb-1">
-              <span className={`w-2 h-2 rounded-full ${verdict.dot}`} />
-              <span className={`text-xs font-semibold uppercase tracking-wider ${verdict.label}`}>
-                Recruiter Verdict
-              </span>
-            </div>
-            <p className={`text-lg font-semibold mb-1.5 ${verdict.heading}`}>
+          <div
+            className="rf-verdict-banner animate-slide-up"
+            style={{
+              borderLeft: `4px solid ${verdict.borderColor}`,
+              backgroundColor: verdict.bg,
+              borderRadius: '12px',
+              padding: '24px 28px',
+              marginBottom: '36px',
+              animationDelay: '0ms',
+            }}
+          >
+            <span
+              style={{
+                display: 'block',
+                fontSize: '0.7rem',
+                fontWeight: 600,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                color: verdict.labelColor,
+                marginBottom: '8px',
+              }}
+            >
+              Recruiter Verdict
+            </span>
+            <h2
+              className="rf-verdict-title"
+              style={{
+                fontWeight: 700,
+                fontSize: '1.6rem',
+                color: verdict.headingColor,
+                margin: '0 0 10px 0',
+                lineHeight: 1.3,
+              }}
+            >
               {verdict.displayText}
-            </p>
-            <p className={`text-sm leading-relaxed ${verdict.label}`}>
+            </h2>
+            <p className="rf-verdict-reasoning" style={{ fontSize: '0.95rem', color: '#4a6b6b', lineHeight: 1.7, margin: 0 }}>
               {result.overallVerdict.reasoning}
             </p>
           </div>
 
           {/* Tailored resume */}
           <section>
-            <h2 className="text-base font-semibold text-gray-900 mb-4">Tailored Resume</h2>
+            <h3
+              className="animate-slide-up"
+              style={{
+                fontSize: '1.125rem',
+                fontWeight: 600,
+                color: '#1a2e2e',
+                margin: '0 0 16px 0',
+                animationDelay: '80ms',
+              }}
+            >
+              Tailored Resume
+            </h3>
 
             {bullets.length === 0 ? (
-              <div className="bg-white border border-gray-200 rounded-xl p-5">
-                <p className="text-sm text-gray-500 leading-relaxed">
+              <div
+                className="animate-slide-up"
+                style={{
+                  border: '1px solid #d0ecea',
+                  borderRadius: '12px',
+                  padding: '28px 32px',
+                  boxShadow: CARD_SHADOW,
+                  animationDelay: '160ms',
+                }}
+              >
+                <p style={{ fontSize: '0.9rem', color: '#4a6b6b', lineHeight: 1.7, margin: 0 }}>
                   No tailored bullets could be generated — the resume did not contain verifiable
                   evidence for any of the job requirements. Consider adding relevant experience to
                   your resume before re-running.
                 </p>
               </div>
             ) : (
-              <ul className="space-y-3">
-                {bullets.map((bullet) => {
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {bullets.map((bullet, index) => {
                   const def = DEFENSIBILITY_CONFIG[bullet.defensibility.flag];
                   const isExpanded = expandedBullets.has(bullet.id);
 
                   return (
-                    <li key={bullet.id} className="bg-white border border-gray-200 rounded-xl p-5">
-                      {/* Rewritten bullet text */}
-                      <p className="text-sm text-gray-900 leading-relaxed mb-3">
+                    <li
+                      key={bullet.id}
+                      className="rf-bullet-card animate-slide-up"
+                      style={{
+                        backgroundColor: '#ffffff',
+                        borderRadius: '12px',
+                        boxShadow: CARD_SHADOW,
+                        borderLeft: '3px solid #32c8cc',
+                        padding: '28px 32px',
+                        animationDelay: `${(index + 2) * 80}ms`,
+                      }}
+                    >
+                      {/* Rewritten text */}
+                      <p
+                        className="rf-bullet-text"
+                        style={{
+                          fontSize: '1rem',
+                          fontWeight: 500,
+                          color: '#1a2e2e',
+                          lineHeight: 1.6,
+                          margin: '0 0 16px 0',
+                        }}
+                      >
                         {bullet.rewrittenText}
                       </p>
 
                       {/* Source span toggle */}
                       {bullet.sourceSpans.length > 0 && (
-                        <div className="mb-3">
+                        <div style={{ marginBottom: '16px' }}>
                           <button
                             onClick={() => toggleBullet(bullet.id)}
                             aria-expanded={isExpanded}
-                            className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:text-blue-800 transition-colors"
+                            className="rf-toggle"
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '5px',
+                              fontSize: '0.8rem',
+                              fontWeight: 500,
+                              color: '#0d7377',
+                              background: 'none',
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: 0,
+                              fontFamily: 'inherit',
+                              transition: `color 280ms ${SILK}`,
+                            }}
                           >
-                            <span className="text-[10px]">{isExpanded ? '▲' : '▼'}</span>
+                            <span
+                              style={{
+                                display: 'inline-block',
+                                fontSize: '0.65rem',
+                                transition: `transform 280ms ${SILK}`,
+                                transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                              }}
+                            >
+                              ▼
+                            </span>
                             {isExpanded ? 'Hide source' : 'View source from your resume'}
                           </button>
+
                           {isExpanded && (
-                            <div className="mt-2 pl-3 border-l-2 border-blue-100 space-y-1">
+                            <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
                               {bullet.sourceSpans.map((span, i) => (
-                                <p key={i} className="text-xs text-gray-500 italic leading-relaxed">
+                                <p
+                                  key={i}
+                                  style={{
+                                    fontSize: '0.9rem',
+                                    fontStyle: 'italic',
+                                    color: '#4a6b6b',
+                                    lineHeight: 1.6,
+                                    margin: 0,
+                                    borderLeft: '3px solid #d0ecea',
+                                    backgroundColor: '#f0faf8',
+                                    padding: '8px 12px',
+                                    borderRadius: '0 6px 6px 0',
+                                  }}
+                                >
                                   &ldquo;{span}&rdquo;
                                 </p>
                               ))}
@@ -237,16 +418,27 @@ export default function Home() {
                         </div>
                       )}
 
-                      {/* Defensibility */}
-                      <div className="flex flex-col gap-1">
+                      {/* Defensibility badge + follow-up */}
+                      <div>
                         <span
-                          className={`inline-flex w-fit text-xs font-medium px-2 py-0.5 rounded-full ${def.badge}`}
+                          style={{
+                            display: 'inline-block',
+                            backgroundColor: def.bg,
+                            color: def.color,
+                            fontSize: '0.75rem',
+                            fontWeight: 600,
+                            padding: '3px 10px',
+                            borderRadius: '9999px',
+                            marginBottom: '6px',
+                          }}
                         >
                           {def.label}
                         </span>
-                        <p className="text-xs text-gray-500 leading-relaxed">
-                          <span className="font-medium text-gray-600">Likely follow-up: </span>
-                          {bullet.defensibility.likelyFollowUpQuestion}
+                        <p style={{ fontSize: '0.85rem', color: '#4a6b6b', lineHeight: 1.6, margin: 0 }}>
+                          <span style={{ fontWeight: 500, color: '#1a2e2e' }}>Likely follow-up: </span>
+                          <span style={{ fontStyle: 'italic' }}>
+                            {bullet.defensibility.likelyFollowUpQuestion}
+                          </span>
                         </p>
                       </div>
                     </li>
@@ -255,86 +447,266 @@ export default function Home() {
               </ul>
             )}
           </section>
-        </div>
-      </main>
+        </main>
+        </PageShell>
+      </div>
     );
   }
 
   // ── Input form ──────────────────────────────────────────────────────────────
 
-  return (
-    <main className="min-h-screen bg-gray-50">
-      <div className="max-w-3xl mx-auto px-4 py-10">
-        {/* Page header */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">ResumeFit</h1>
-          <p className="text-sm text-gray-500 mt-1 leading-relaxed">
-            Tailors your resume to a job posting — only using evidence it can trace back to your
-            real experience, and flags which claims you might struggle to defend in an interview.
-          </p>
-        </div>
+  const textareaStyle: React.CSSProperties = {
+    display: 'block',
+    width: '100%',
+    border: '1.5px solid #d0ecea',
+    borderRadius: '8px',
+    padding: '12px 14px',
+    fontSize: '0.925rem',
+    color: '#1a2e2e',
+    backgroundColor: '#ffffff',
+    resize: 'vertical',
+    fontFamily: 'inherit',
+    lineHeight: 1.6,
+    height: '300px',
+    transition: `border-color 280ms ${SILK}, box-shadow 280ms ${SILK}`,
+  };
 
-        {/* Form */}
-        <div className="space-y-5">
-          {/* Resume */}
-          <div>
-            <label htmlFor="resume" className="block text-sm font-medium text-gray-800 mb-1.5">
-              Your resume
-            </label>
+  const stepLabelStyle: React.CSSProperties = {
+    fontSize: '0.85rem',
+    fontWeight: 700,
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase',
+    color: '#0d7377',
+    margin: 0,
+  };
+
+  const stepCircle: React.CSSProperties = {
+    width: '28px',
+    height: '28px',
+    borderRadius: '50%',
+    backgroundColor: '#0d7377',
+    color: '#ffffff',
+    fontWeight: 700,
+    fontSize: '0.85rem',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  };
+
+  const inputCard: React.CSSProperties = {
+    backgroundColor: '#ffffff',
+    border: '1.5px solid #d0ecea',
+    borderRadius: '12px',
+    padding: '24px',
+    boxShadow: CARD_SHADOW,
+  };
+
+  return (
+    <div style={{ backgroundColor: '#f0faf8', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <SiteHeader />
+
+      <main className="rf-page-content" style={{ flex: 1, padding: '48px 24px' }}>
+
+        {/* Two-column input cards */}
+        <div
+          className="rf-input-grid"
+          style={{
+            maxWidth: '900px',
+            margin: '0 auto',
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '20px',
+          }}
+        >
+          {/* Card 1 — Resume */}
+          <div style={inputCard}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
+              <div style={stepCircle}>1</div>
+              <label htmlFor="resume" style={stepLabelStyle}>
+                Step 1: Your Resume
+              </label>
+            </div>
             <textarea
               id="resume"
               value={resumeText}
               onChange={(e) => setResumeText(e.target.value)}
-              rows={10}
               placeholder="Paste your resume here as plain text…"
               disabled={isLoading}
-              className="w-full rounded-lg border border-gray-300 px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50 resize-y"
+              className="rf-input rf-textarea"
+              style={textareaStyle}
             />
-            <p className="text-xs text-gray-400 mt-1">{resumeText.trim().length} / 6,000 characters</p>
+            <p style={{ fontSize: '0.75rem', color: '#4a6b6b', marginTop: '5px', marginBottom: 0 }}>
+              {resumeText.trim().length} / 6,000 characters
+            </p>
           </div>
 
-          {/* Job posting */}
-          <div>
-            <label htmlFor="posting" className="block text-sm font-medium text-gray-800 mb-1.5">
-              Job posting
-            </label>
+          {/* Card 2 — Job posting */}
+          <div style={inputCard}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
+              <div style={stepCircle}>2</div>
+              <label htmlFor="posting" style={stepLabelStyle}>
+                Step 2: Your Target Job Posting
+              </label>
+            </div>
             <textarea
               id="posting"
               value={jobPostingText}
               onChange={(e) => setJobPostingText(e.target.value)}
-              rows={10}
               placeholder="Paste the full job posting here as plain text…"
               disabled={isLoading}
-              className="w-full rounded-lg border border-gray-300 px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50 resize-y"
+              className="rf-input rf-textarea"
+              style={textareaStyle}
             />
-            <p className="text-xs text-gray-400 mt-1">
+            <p style={{ fontSize: '0.75rem', color: '#4a6b6b', marginTop: '5px', marginBottom: 0 }}>
               {jobPostingText.trim().length} / 6,000 characters
             </p>
           </div>
+        </div>
 
-          {/* Error */}
-          {error && (
-            <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3.5 py-2.5">
-              {error}
-            </p>
-          )}
+        {/* Error */}
+        {error && (
+          <div
+            style={{
+              maxWidth: '900px',
+              margin: '16px auto 0',
+              backgroundColor: '#fef2f2',
+              border: '1px solid #fca5a5',
+              borderRadius: '8px',
+              padding: '12px 16px',
+              fontSize: '0.875rem',
+              color: '#dc2626',
+              lineHeight: 1.5,
+            }}
+          >
+            {error}
+          </div>
+        )}
 
-          {/* Submit */}
+        {/* Submit */}
+        <div style={{ maxWidth: '900px', margin: '28px auto 0' }}>
           <button
             onClick={handleSubmit}
             disabled={isLoading}
-            className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 text-white font-medium text-sm rounded-lg px-4 py-2.5 transition-colors"
+            className="rf-btn-primary"
+            style={{
+              width: '100%',
+              backgroundColor: '#0d7377',
+              color: '#ffffff',
+              fontFamily: 'inherit',
+              fontWeight: 600,
+              fontSize: '0.9rem',
+              padding: '14px 32px',
+              borderRadius: '8px',
+              border: 'none',
+              cursor: isLoading ? 'not-allowed' : 'pointer',
+              transition: `background-color 280ms ${SILK}, transform 280ms ${SILK}`,
+              opacity: isLoading ? 0.65 : 1,
+              letterSpacing: '0.01em',
+            }}
           >
             {isLoading ? 'Tailoring your resume…' : 'Tailor My Resume'}
           </button>
-
           {isLoading && (
-            <p className="text-xs text-center text-gray-400">
+            <p style={{ fontSize: '0.8rem', color: '#4a6b6b', textAlign: 'center', marginTop: '12px', marginBottom: 0 }}>
               Running the AI pipeline — this typically takes 10–15 seconds.
             </p>
           )}
         </div>
-      </div>
-    </main>
+
+        {/* Why ResumeFit Matters */}
+        <div style={{ maxWidth: '900px', margin: '56px auto 0' }}>
+          <h2
+            style={{
+              fontWeight: 700,
+              fontSize: '1.5rem',
+              color: '#1a2e2e',
+              textAlign: 'center',
+              margin: '0 0 24px 0',
+            }}
+          >
+            Why ResumeFit Matters
+          </h2>
+          <div
+            className="rf-why-grid"
+            style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}
+          >
+            {(
+              [
+                {
+                  icon: (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0d7377" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  ),
+                  title: 'Authentic Match',
+                  description:
+                    'Only rewrites bullets backed by real evidence from your resume — nothing fabricated.',
+                },
+                {
+                  icon: (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0d7377" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                  ),
+                  title: 'Interview Ready',
+                  description:
+                    'Flags which rewritten claims you may struggle to defend, with likely recruiter follow-up questions.',
+                },
+                {
+                  icon: (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0d7377" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                  ),
+                  title: 'Your Words First',
+                  description:
+                    "Your experience stays yours. We translate it into the target field's language — we never invent it.",
+                },
+              ] as { icon: React.ReactNode; title: string; description: string }[]
+            ).map(({ icon, title, description }) => (
+              <div key={title} style={inputCard}>
+                <div
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    backgroundColor: '#e8f7f6',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {icon}
+                </div>
+                <p style={{ fontWeight: 700, fontSize: '1rem', color: '#1a2e2e', margin: '12px 0 0 0' }}>
+                  {title}
+                </p>
+                <p style={{ fontSize: '0.9rem', color: '#4a6b6b', lineHeight: 1.6, margin: '6px 0 0 0' }}>
+                  {description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer
+        className="rf-footer"
+        style={{
+          backgroundColor: '#ffffff',
+          borderTop: '1px solid #d0ecea',
+          padding: '16px 24px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginTop: '48px',
+        }}
+      >
+        <span style={{ fontSize: '0.85rem', color: '#4a6b6b' }}>© 2026 ResumeFit</span>
+        <span style={{ fontSize: '0.85rem', color: '#4a6b6b' }}>Tailor your resume with confidence.</span>
+      </footer>
+    </div>
   );
 }
