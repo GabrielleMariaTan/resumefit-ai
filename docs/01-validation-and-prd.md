@@ -26,7 +26,7 @@ Generic resume tailoring tools assume the user already speaks the target industr
 
 ## Step 2: Problem Interviews (User Evidence)
 
-Eleven responses were collected via a short survey distributed to career shifters (June 29–30, 2026). Respondents spanned a real mix of transitions: engineering → design, teaching → ed-psych, market research → psychology, manufacturing (lateral), HR → education, art → finance, finance → marketing, corporate → tech, education → applied math academia, architecture → fashion design, and mental health → social work-adjacent.
+Twenty-two responses were collected via a short survey distributed to career shifters (June 29–July 1, 2026). Respondents spanned a real mix of transitions: engineering → design, teaching → ed-psych, market research → psychology, manufacturing (lateral), HR → education, art → finance, finance → marketing, corporate → tech, education → applied math academia, architecture → fashion design, mental health → social work-adjacent, tourism → IT, engineering → data analyst, NGO → events/creatives, psychology → HR, telecom → power plant, and several intra-industry lateral moves.
 
 Respondents were asked five questions: the hardest part of applying outside their field; whether they'd been rejected or ignored without knowing why; whether they'd used AI to tailor their resume and whether it felt accurate; whether anything on their resume, AI-written or not, was hard to explain in an interview; and whether an honest "would a recruiter advance you, and why" tool would be useful.
 
@@ -34,7 +34,7 @@ Respondents were asked five questions: the hardest part of applying outside thei
 
 The "translation" problem is real and consistent. The dominant theme across responses wasn't lack of skill, but lack of legible evidence of skill. Respondents described the hardest part as "skill overlap and skills needed for transfer," "convincing employers that corporate experience is transferable... despite limited direct background," and being "rejected for interviews due to lack of experience but cannot gain experience without being given a chance" — a direct articulation of the translation gap this product addresses, not a generic "I need more skills" complaint.
 
-Rejection without explanation is close to universal. Eight of eleven respondents said yes to having been rejected or ignored without knowing why; most of the rest said "not yet" or implied uncertainty rather than a clear no. This validates the demand for a tool that explains why a recruiter would or wouldn't advance someone, not just a pass/fail score.
+Rejection without explanation is close to universal. Twelve of twenty-two respondents said yes to having been rejected or ignored without knowing why; most of the rest said "not yet" or implied uncertainty rather than a clear no. This validates the demand for a tool that explains why a recruiter would or wouldn't advance someone, not just a pass/fail score.
 
 AI resume tools are already widely used, but trust is inconsistent — the strongest validation for the traceability and defensibility angle. Several respondents specifically flagged accuracy problems with AI-generated content. One respondent said AI "would inflate my skills and add unnecessary keywords to my project background" — direct evidence of the fabrication risk the grounded-rewrite feature is designed to prevent. Another noted AI's word choice "may be exaggerated" and that something "more personal still feels better." A third said outright that "some parts of my resume were worded better than I could explain them during the interview" — close to a verbatim restatement of the exact defensibility problem the product is built around.
 
@@ -50,6 +50,8 @@ Demand for an honest recruiter-style verdict is strong. Nearly every respondent 
 
 > "Some parts of my resume were worded better than I could explain them during the interview." — Architecture → Fashion Design respondent
 
+> "Some of the wording sounded too advanced, so I had to explain it in simpler terms." — Tourism → IT respondent
+
 > An honest recruiter-style tool "would help me understand my weaknesses and improve my application before submitting it." — Corporate → Technology respondent
 
 Full anonymized survey responses are available in `docs/raw-survey-responses.csv`.
@@ -58,7 +60,7 @@ Full anonymized survey responses are available in `docs/raw-survey-responses.csv
 
 ## Step 3: The Problem (Problem Evidence)
 
-Career switchers applying for roles outside their current field struggle to communicate that their existing experience is relevant, because hiring processes and job postings use industry-specific language that doesn't match how their experience was earned or described in their previous field. Survey evidence confirms this isn't a vocabulary issue alone: eight of eleven respondents reported being rejected or ignored without explanation, and several specifically described AI resume tools inflating or exaggerating their experience in ways they couldn't actually defend when asked about it directly. This results in candidates either submitting resumes they don't fully trust, or being screened out despite having real, relevant transferable experience.
+Career switchers applying for roles outside their current field struggle to communicate that their existing experience is relevant, because hiring processes and job postings use industry-specific language that doesn't match how their experience was earned or described in their previous field. Survey evidence confirms this isn't a vocabulary issue alone: twelve of twenty-two respondents reported being rejected or ignored without explanation, and several specifically described AI resume tools inflating or exaggerating their experience in ways they couldn't actually defend when asked about it directly. This results in candidates either submitting resumes they don't fully trust, or being screened out despite having real, relevant transferable experience.
 
 This problem is grounded in the Step 2 survey data above, supported by general ATS and career-switch friction statistics and AI-resume trust statistics below. A concrete example: the Architecture → Fashion Design respondent's quote that some resume content was "worded better than I could explain it during the interview" is a direct, specific instance of the exact problem this product solves.
 
@@ -130,7 +132,7 @@ Success is measured by running real resume and posting pairs from survey respond
 Career switchers struggle to communicate that their existing experience is relevant to a new field, because job postings use industry-specific language their resumes don't mirror. When they use AI tools to tailor their resume, the rewritten content often drifts from what they can actually prove — producing resumes that read well but leave the candidate unable to defend their own claims in an interview, or hesitant to submit the resume at all.
 
 **Target user**
-Career switchers moving into adjacent or unrelated fields (e.g. teacher → instructional design, BPO/corporate → tech, engineering → design, architecture → fashion design). Validated through a survey of 11 real career-shifters across varied industry transitions (June 2026), who described both the translation difficulty and discomfort with AI-generated resume content they couldn't fully stand behind — see Step 2 above for full findings.
+Career switchers moving into adjacent or unrelated fields (e.g. teacher → instructional design, BPO/corporate → tech, engineering → design, architecture → fashion design). Validated through a survey of 22 real career-shifters across varied industry transitions (June–July 2026), who described both the translation difficulty and discomfort with AI-generated resume content they couldn't fully stand behind — see Step 2 above for full findings.
 
 **Differentiating angle**
 Unlike AI resume tailoring tools that rewrite freely, ResumeFit only rewrites what it can justify: every tailored bullet is traceable back to specific evidence in the original resume, and is flagged with whether the user could realistically defend it under interview questioning.
