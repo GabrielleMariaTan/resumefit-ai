@@ -75,6 +75,14 @@ export async function matchEvidence(
   });
 }
 
+function stripFences(text: string): string {
+  return text
+    .trim()
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/\s*```\s*$/, '')
+    .trim();
+}
+
 async function callWithRetry(
   requirements: ExtractedRequirement[],
   resumeText: string,
@@ -91,7 +99,7 @@ async function callWithRetry(
   const text = extractText(first.content);
 
   try {
-    JSON.parse(text);
+    JSON.parse(stripFences(text));
     return text;
   } catch {
     const retry = await anthropic.messages.create({
@@ -137,7 +145,7 @@ function parseAndValidate(
 ): RequirementWithEvidence[] {
   let data: unknown;
   try {
-    data = JSON.parse(raw);
+    data = JSON.parse(stripFences(raw));
   } catch {
     throw new Error('Evidence matching: AI returned invalid JSON after retry');
   }

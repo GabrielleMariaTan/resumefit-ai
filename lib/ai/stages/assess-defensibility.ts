@@ -55,6 +55,14 @@ export async function assessDefensibility(
   return parseAndMerge(raw, bullets);
 }
 
+function stripFences(text: string): string {
+  return text
+    .trim()
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/\s*```\s*$/, '')
+    .trim();
+}
+
 async function callWithRetry(bullets: TailoredBullet[]): Promise<string> {
   const userMessage = buildUserMessage(bullets);
 
@@ -68,7 +76,7 @@ async function callWithRetry(bullets: TailoredBullet[]): Promise<string> {
   const text = extractText(first.content);
 
   try {
-    JSON.parse(text);
+    JSON.parse(stripFences(text));
     return text;
   } catch {
     const retry = await anthropic.messages.create({
@@ -110,7 +118,7 @@ function extractText(content: Anthropic.Messages.ContentBlock[]): string {
 function parseAndMerge(raw: string, bullets: TailoredBullet[]): TailoredBulletWithDefensibility[] {
   let data: unknown;
   try {
-    data = JSON.parse(raw);
+    data = JSON.parse(stripFences(raw));
   } catch {
     throw new Error('Defensibility assessment: AI returned invalid JSON after retry');
   }

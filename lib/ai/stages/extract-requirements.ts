@@ -6,13 +6,17 @@ const MODEL = 'claude-haiku-4-5-20251001';
 
 const SYSTEM_PROMPT = `You are a structured requirement extractor for job postings.
 
-Rules:
+CRITICAL OUTPUT RULE: Your entire response must be a single raw JSON object and nothing else.
+- Do NOT use markdown code fences (\`\`\`json or \`\`\` or any variation)
+- Do NOT write any explanation, preamble, or trailing text
+- Start your response with { and end with }
+
+Extraction rules:
 - Extract every discrete, atomic requirement from the job posting
 - Each item must be a single, atomic claim — split compound requirements into separate items
 - Only extract requirements explicitly stated in the posting — do not infer, assume, or add requirements not present in the text
-- Output valid JSON only, no prose, no markdown fences
 
-Output format (JSON only):
+Required JSON format:
 {
   "requirements": [
     { "id": "req_1", "requirementText": "<exact or close paraphrase of the stated requirement>" },
@@ -27,6 +31,14 @@ export async function extractRequirements(
   return parseAndValidate(raw);
 }
 
+function stripFences(text: string): string {
+  return text
+    .trim()
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/\s*```\s*$/, '')
+    .trim();
+}
+
 async function callWithRetry(jobPostingText: string): Promise<string> {
   const first = await anthropic.messages.create({
     model: MODEL,
@@ -38,7 +50,7 @@ async function callWithRetry(jobPostingText: string): Promise<string> {
   const text = extractText(first.content);
 
   try {
-    JSON.parse(text);
+    JSON.parse(stripFences(text));
     return text;
   } catch {
     // First response wasn't valid JSON — retry with a stricter reminder
@@ -69,7 +81,7 @@ function extractText(content: Anthropic.Messages.ContentBlock[]): string {
 function parseAndValidate(raw: string): ExtractedRequirement[] {
   let data: unknown;
   try {
-    data = JSON.parse(raw);
+    data = JSON.parse(stripFences(raw));
   } catch {
     throw new Error('Requirement extraction: AI returned invalid JSON after retry');
   }

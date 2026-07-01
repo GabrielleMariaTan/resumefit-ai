@@ -40,6 +40,14 @@ export async function generateVerdict(
   return parseAndValidate(raw);
 }
 
+function stripFences(text: string): string {
+  return text
+    .trim()
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/\s*```\s*$/, '')
+    .trim();
+}
+
 async function callWithRetry(requirements: RequirementWithEvidence[]): Promise<string> {
   const userMessage = buildUserMessage(requirements);
 
@@ -53,7 +61,7 @@ async function callWithRetry(requirements: RequirementWithEvidence[]): Promise<s
   const text = extractText(first.content);
 
   try {
-    JSON.parse(text);
+    JSON.parse(stripFences(text));
     return text;
   } catch {
     const retry = await anthropic.messages.create({
@@ -94,7 +102,7 @@ function extractText(content: Anthropic.Messages.ContentBlock[]): string {
 function parseAndValidate(raw: string): OverallVerdict {
   let data: unknown;
   try {
-    data = JSON.parse(raw);
+    data = JSON.parse(stripFences(raw));
   } catch {
     throw new Error('Verdict generation: AI returned invalid JSON after retry');
   }
