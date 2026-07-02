@@ -4,7 +4,7 @@
 
 > ResumeFit rewrites your resume to match any job posting — but only using evidence it can point to in your real experience, and it tells you whether you could actually defend each claim in an interview.
 
-🔗 **Live App:** [link-to-your-deployed-app](#) *(add once deployed)*
+🔗 **Live App:** [ResumeFit on Vercel](https://resumefit-ai-nine.vercel.app)
 🎥 **Demo Video (2 min):** [link-to-demo](#) *(add once recorded)*
 📄 **Full Project Docs:** [`/docs`](./docs)
 
