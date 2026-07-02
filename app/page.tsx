@@ -247,7 +247,7 @@ export default function Home() {
 
     return (
       <div style={{ backgroundColor: '#f0faf8', minHeight: '100vh' }}>
-        <SiteHeader onReset={handleReset} />
+        <SiteHeader />
         <PageShell>
         <main className="rf-page-content" style={{ padding: '48px 32px' }}>
 
@@ -447,6 +447,13 @@ export default function Home() {
               </ul>
             )}
           </section>
+
+          {/* Start over */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '40px', marginBottom: '48px' }}>
+            <button onClick={handleReset} className="rf-start-over-btn">
+              ← Start over
+            </button>
+          </div>
         </main>
         </PageShell>
       </div>
