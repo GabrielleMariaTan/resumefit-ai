@@ -45,6 +45,7 @@ ResumeFit takes a resume and a job posting as input and:
 2. Checks the original resume for real evidence of each requirement — even when the resume uses completely different vocabulary
 3. Generates a tailored resume rewrite, but **only** writes a bullet when it can trace that claim back to specific evidence in the original resume
 4. Flags each rewritten bullet with a likely recruiter follow-up question and a defensibility read — helping the user know what they'd need to be ready to elaborate on
+5. Suggested interview answer per bullet — AI-generated response grounded in the same resume evidence, collapsible, framed as a starting point to personalise
 
 ## What Makes This Different
 
@@ -200,6 +201,10 @@ See the open GitHub Issues tab for the specific v2 improvement logged for this a
 ## Reflection
 
 A full 1-page reflection on what was built, what was learned, and what would be improved is available at [`/docs/04-reflection.md`](./docs/04-reflection.md).
+
+## Design
+
+UI visual language inspired by the [Clearwave template](https://templatemo.com/tm-622-clearwave) by Templatemo, free for personal and commercial use. Color palette, typography (DM Sans), spacing tokens, and easing curves adapted into a Next.js + Tailwind implementation.
 
 ## Author
 
