@@ -16,6 +16,7 @@ interface TailoredBullet {
   defensibility: {
     flag: DefensibilityFlag;
     likelyFollowUpQuestion: string;
+    suggestedAnswer: string;
   };
 }
 
@@ -172,9 +173,19 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<TailorResult | null>(null);
   const [expandedBullets, setExpandedBullets] = useState<Set<string>>(new Set());
+  const [expandedAnswers, setExpandedAnswers] = useState<Set<string>>(new Set());
 
   function toggleBullet(id: string) {
     setExpandedBullets((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleAnswer(id: string) {
+    setExpandedAnswers((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
@@ -237,6 +248,7 @@ export default function Home() {
     setResult(null);
     setError(null);
     setExpandedBullets(new Set());
+    setExpandedAnswers(new Set());
   }
 
   // ── Results view ────────────────────────────────────────────────────────────
@@ -330,6 +342,7 @@ export default function Home() {
                 {bullets.map((bullet, index) => {
                   const def = DEFENSIBILITY_CONFIG[bullet.defensibility.flag];
                   const isExpanded = expandedBullets.has(bullet.id);
+                  const isAnswerExpanded = expandedAnswers.has(bullet.id);
 
                   return (
                     <li
@@ -434,12 +447,69 @@ export default function Home() {
                         >
                           {def.label}
                         </span>
-                        <p style={{ fontSize: '0.85rem', color: '#4a6b6b', lineHeight: 1.6, margin: 0 }}>
+                        <p style={{ fontSize: '0.85rem', color: '#4a6b6b', lineHeight: 1.6, margin: '0 0 10px 0' }}>
                           <span style={{ fontWeight: 500, color: '#1a2e2e' }}>Likely follow-up: </span>
                           <span style={{ fontStyle: 'italic' }}>
                             {bullet.defensibility.likelyFollowUpQuestion}
                           </span>
                         </p>
+
+                        {/* Suggested answer */}
+                        <div>
+                          <button
+                            onClick={() => toggleAnswer(bullet.id)}
+                            aria-expanded={isAnswerExpanded}
+                            className="rf-toggle"
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '5px',
+                              fontSize: '0.8rem',
+                              fontWeight: 500,
+                              color: '#0d7377',
+                              background: 'none',
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: 0,
+                              fontFamily: 'inherit',
+                              transition: `color 280ms ${SILK}`,
+                            }}
+                          >
+                            💡 {isAnswerExpanded ? 'Hide suggested answer' : 'See a suggested answer'}
+                          </button>
+
+                          {isAnswerExpanded && (
+                            <div
+                              style={{
+                                marginTop: '10px',
+                                backgroundColor: '#f0faf8',
+                                borderLeft: '3px solid #0d7377',
+                                padding: '12px 16px',
+                                borderRadius: '6px',
+                              }}
+                            >
+                              <span
+                                style={{
+                                  display: 'block',
+                                  fontSize: '0.7rem',
+                                  fontWeight: 600,
+                                  letterSpacing: '0.1em',
+                                  textTransform: 'uppercase',
+                                  color: '#0d7377',
+                                  marginBottom: '6px',
+                                }}
+                              >
+                                Suggested Answer
+                              </span>
+                              <p style={{ fontSize: '0.9rem', color: '#1a2e2e', lineHeight: 1.6, margin: '0 0 8px 0' }}>
+                                {bullet.defensibility.suggestedAnswer}
+                              </p>
+                              <p style={{ fontSize: '0.8rem', color: '#4a6b6b', fontStyle: 'italic', margin: 0 }}>
+                                Use this as a starting point — personalise it with your own specific details.
+                              </p>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </li>
                   );

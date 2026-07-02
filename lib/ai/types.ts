@@ -22,6 +22,7 @@ export type DefensibilityFlag = 'likely_defensible' | 'be_ready_to_elaborate';
 export interface Defensibility {
   flag: DefensibilityFlag;
   likelyFollowUpQuestion: string;
+  suggestedAnswer: string;
 }
 
 export interface TailoredBulletWithDefensibility extends TailoredBullet {

@@ -27,6 +27,12 @@ For likelyFollowUpQuestion:
 - The question should target the gap between the source evidence and the rewritten bullet
 - Never use generic filler like "Tell me more", "Can you elaborate on that?", or "Walk me through it" as standalone questions — be specific to the content
 
+For suggestedAnswer:
+- Write 2-4 sentences in first person, as if the candidate is speaking in an interview
+- Ground the answer in the sourceSpans — reference the actual experience, do not invent new details
+- Keep the tone natural and conversational, not formal or robotic
+- Frame it as a starting point the candidate can personalise, not a script to memorise
+
 Output valid JSON only, no prose, no markdown fences.
 
 Output format:
@@ -35,7 +41,8 @@ Output format:
     {
       "bulletId": "<id from input>",
       "flag": "likely_defensible" | "be_ready_to_elaborate",
-      "likelyFollowUpQuestion": "<specific recruiter question>"
+      "likelyFollowUpQuestion": "<specific recruiter question>",
+      "suggestedAnswer": "<2-4 sentence first-person answer grounded in the sourceSpans>"
     }
   ]
 }`;
@@ -44,6 +51,8 @@ const FALLBACK_DEFENSIBILITY = {
   flag: 'be_ready_to_elaborate' as DefensibilityFlag,
   likelyFollowUpQuestion:
     'Can you describe a specific situation where you applied this skill and what the outcome was?',
+  suggestedAnswer:
+    'In my previous role, I applied this skill in a hands-on way that I can walk through in detail. I\'d be happy to share a specific example that shows how I developed and used it.',
 };
 
 export async function assessDefensibility(
@@ -135,7 +144,7 @@ function parseAndMerge(raw: string, bullets: TailoredBullet[]): TailoredBulletWi
 
   const assessmentMap = new Map<
     string,
-    { flag: DefensibilityFlag; likelyFollowUpQuestion: string }
+    { flag: DefensibilityFlag; likelyFollowUpQuestion: string; suggestedAnswer: string }
   >();
 
   for (const item of assessmentsRaw) {
@@ -156,7 +165,12 @@ function parseAndMerge(raw: string, bullets: TailoredBullet[]): TailoredBulletWi
         ? a.likelyFollowUpQuestion.trim()
         : FALLBACK_DEFENSIBILITY.likelyFollowUpQuestion;
 
-    assessmentMap.set(bulletId, { flag, likelyFollowUpQuestion });
+    const suggestedAnswer =
+      typeof a.suggestedAnswer === 'string' && a.suggestedAnswer.trim()
+        ? a.suggestedAnswer.trim()
+        : FALLBACK_DEFENSIBILITY.suggestedAnswer;
+
+    assessmentMap.set(bulletId, { flag, likelyFollowUpQuestion, suggestedAnswer });
   }
 
   // Merge back in original bullet order; default to conservative fallback if the model omits a bullet.
